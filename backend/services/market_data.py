@@ -1,16 +1,25 @@
+from services.decision_engine import generate_decision
+from services.indicators import calculate_indicators
 import yfinance as yf
 
-def get_stock_price(symbol, market):
+def get_stock_analysis(symbol, market):
     if market == "IN":
         symbol = f"{symbol}.NS"
 
     stock = yf.Ticker(symbol)
-    hist = stock.history(period="1d")
+    df = stock.history(period="6mo")
 
-    if hist.empty:
+    if df.empty:
         return {"error": "Invalid symbol"}
+
+    indicators = calculate_indicators(df)
+    decision = generate_decision(indicators)
+
+    latest_price = round(df["Close"].iloc[-1], 2)
 
     return {
         "symbol": symbol,
-        "price": round(hist["Close"][0], 2)
+        "price": latest_price,
+        "indicators": indicators,
+        "decision": decision
     }
