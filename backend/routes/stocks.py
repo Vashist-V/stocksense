@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.market_data import get_stock_analysis
+from services.trending import fetch_trending
 
 stocks_bp = Blueprint("stocks", __name__)
 
@@ -17,3 +18,9 @@ def analysis():
 
     result = get_stock_analysis(symbol, market)
     return jsonify(result)
+
+@stocks_bp.route("/trending")
+def trending():
+    market = request.args.get("market")
+    data = fetch_trending(market)
+    return jsonify(data)

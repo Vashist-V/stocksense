@@ -1,21 +1,12 @@
 from flask import Blueprint, request, jsonify
-from services.market_data import get_stock_price
+from services.portfolio_service import fetch_user_portfolio
+from services.portfolio_analysis import analyze_portfolio
 
 portfolio_bp = Blueprint("portfolio", __name__)
 
-@portfolio_bp.route("/analyze")
+@portfolio_bp.route("/portfolio/analyze")
 def analyze():
-    holdings = request.json
-    results = []
-
-    for h in holdings:
-        price = get_stock_price(h["symbol"], h["market"])["price"]
-        pnl = (price - h["buy_price"]) * h["quantity"]
-
-        results.append({
-            **h,
-            "current_price": price,
-            "pnl": round(pnl, 2)
-        })
-
-    return jsonify(results)
+    user_id = request.args.get("user_id")
+    holdings = fetch_user_portfolio(user_id)
+    analysis = analyze_portfolio(holdings)
+    return jsonify(analysis)

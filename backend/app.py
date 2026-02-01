@@ -1,11 +1,17 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask
 from flask_cors import CORS
+
 from routes.stocks import stocks_bp
+from routes.portfolio import portfolio_bp
 
 app = Flask(__name__)
 CORS(app)
 
 app.register_blueprint(stocks_bp, url_prefix="/api")
+app.register_blueprint(portfolio_bp, url_prefix="/api")
 
 @app.route("/health")
 def health():
